@@ -1,0 +1,18 @@
+{
+  "id": "studio-3d",
+  "nama": "Studio 3D",
+  "kategori": "3d",
+  "deskripsi": "Latar studio terang lembut, huruf bertebal 3D berwarna koral, kartu putih miring dengan bayangan, dan kolom 3D. Bersih dan modern; cocok untuk produk, bisnis, edukasi, dan presentasi data.",
+  "warna": {"latar": "#EEF2FA", "latar2": "#D6DFF0", "teks": "#1B2440", "aksen": "#FF6B6B", "aksen2": "#4D96FF", "redup": "#6B7592", "kartu": "#FFFFFF", "teks_di_aksen": "#FFFFFF", "label": "#FF6B6B", "teks_label": "#FFFFFF", "stroke": "#1B2440"},
+  "font": {"judul": "ArchivoBlack-Regular.ttf", "isi": "Poppins-Bold.ttf", "subtitle": "Poppins-Bold.ttf"},
+  "ukuran": {"hook": 104, "angka": 250, "isi": 62, "label": 58, "subtitle": 56},
+  "teks_3d": {"aktif": true, "kedalaman": 16, "arah": [1, 1], "warna_sisi": "#8A93B2"},
+  "kartu_3d": {"aktif": true, "sudut": 12},
+  "bar_gaya": "tiang3d",
+  "latar_gerak": {"tipe": "glow", "kekuatan": 0.28, "pola": "titik"},
+  "gerak": {"easing": "overshoot", "masuk": 0.5, "stagger": 0.14},
+  "transisi": {"tipe": "naik"},
+  "subtitle": {"latar": "pill"},
+  "bentuk": {"radius": 30},
+  "efek": {"vignette": 0.18}
+}

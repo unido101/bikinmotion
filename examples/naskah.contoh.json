@@ -1,0 +1,14 @@
+{
+  "judul": "CONTOH: uji alur otomatis (teks tiruan, bukan fakta)",
+  "style": "bersih-edukasi",
+  "bagian": [
+    {"tipe": "hook", "teks": ["Ini hook *contoh*", "untuk uji alur"],
+     "ucapan": "Ini contoh hook untuk menguji alur otomatis."},
+    {"tipe": "angka", "nilai": 42, "akhiran": " contoh", "label": "angka *contoh* untuk uji", "sumber": "DATA CONTOH",
+     "ucapan": "Angka ini hanya contoh, bukan data nyata dan bukan fakta."},
+    {"tipe": "poin", "judul": "Tiga poin contoh", "poin": ["Poin pertama", "Poin kedua", "Poin *ketiga*"],
+     "ucapan": ["Poin pertama muncul saat kalimat ini dibacakan.", "Poin kedua menyusul sesudahnya.", "Poin *ketiga* muncul paling akhir."]},
+    {"tipe": "penutup", "teks": ["Sampai *jumpa*"], "ajakan": "Ikuti untuk contoh lain",
+     "ucapan": "Begitulah cara kerja alur otomatis ini, sampai jumpa."}
+  ]
+}

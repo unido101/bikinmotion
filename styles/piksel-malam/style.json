@@ -1,0 +1,78 @@
+{
+  "id": "piksel-malam",
+  "nama": "Piksel Malam",
+  "kategori": "pixelart",
+  "deskripsi": "Langit malam arcade dengan bintang berkedip dan siluet kota, 16 warna, dithering, garis scan CRT. Retro dan gamer; cocok untuk teknologi, game, trivia, dan fakta cepat.",
+  "warna": {
+    "latar": "#0B1026",
+    "latar2": "#2A2F6B",
+    "teks": "#F4F1DE",
+    "aksen": "#FFD166",
+    "aksen2": "#4CC9F0",
+    "redup": "#8D99AE",
+    "kartu": "#1B2150",
+    "teks_di_aksen": "#0B1026",
+    "label": "#EF476F",
+    "teks_label": "#FFFFFF",
+    "stroke": "#0A0C1A"
+  },
+  "font": {
+    "judul": "FiraSans-Black.ttf",
+    "isi": "AnonymousPro-Bold.ttf",
+    "subtitle": "AnonymousPro-Bold.ttf"
+  },
+  "ukuran": {
+    "hook": 108,
+    "angka": 250,
+    "isi": 72,
+    "label": 64,
+    "subtitle": 68,
+    "kecil": 48
+  },
+  "huruf_besar_judul": true,
+  "latar_gerak": {
+    "tipe": "bintang"
+  },
+  "gerak": {
+    "easing": "ease_out",
+    "masuk": 0.4,
+    "stagger": 0.16
+  },
+  "transisi": {
+    "tipe": "naik",
+    "masuk": 0.3,
+    "keluar": 0.2
+  },
+  "subtitle": {
+    "latar": "pill",
+    "alpha_pill": 0.92
+  },
+  "bentuk": {
+    "radius": 0
+  },
+  "efek": {
+    "piksel": {
+      "skala": 4,
+      "dither": 0.55,
+      "palet": [
+        "#0B1026",
+        "#1B2150",
+        "#2A2F6B",
+        "#4C4F9A",
+        "#8D99AE",
+        "#F4F1DE",
+        "#FFFFFF",
+        "#FFD166",
+        "#F4A261",
+        "#E76F51",
+        "#EF476F",
+        "#8338EC",
+        "#4CC9F0",
+        "#06D6A0",
+        "#118AB2",
+        "#0A0C1A"
+      ]
+    },
+    "scanline": 0.14
+  }
+}

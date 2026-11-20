@@ -1,0 +1,62 @@
+{
+  "id": "piksel-hijau",
+  "nama": "Piksel Hijau",
+  "kategori": "pixelart",
+  "deskripsi": "Layar monokrom hijau ala konsol genggam klasik: 5 warna, grid bergulir, dithering kasar, piksel besar. Nostalgia; cocok untuk sejarah teknologi, tips singkat, dan konten santai.",
+  "warna": {
+    "latar": "#0F380F",
+    "latar2": "#306230",
+    "teks": "#E0F8D0",
+    "aksen": "#9BBC0F",
+    "aksen2": "#8BAC0F",
+    "redup": "#8BAC0F",
+    "kartu": "#306230",
+    "teks_di_aksen": "#0F380F",
+    "label": "#E0F8D0",
+    "teks_label": "#0F380F",
+    "stroke": "#0F380F"
+  },
+  "font": {
+    "judul": "FiraSans-Black.ttf",
+    "isi": "AnonymousPro-Bold.ttf",
+    "subtitle": "AnonymousPro-Bold.ttf"
+  },
+  "ukuran": {
+    "hook": 108,
+    "angka": 250,
+    "isi": 72,
+    "label": 64,
+    "subtitle": 68,
+    "kecil": 48
+  },
+  "huruf_besar_judul": true,
+  "latar_gerak": {
+    "tipe": "grid"
+  },
+  "gerak": {
+    "easing": "ease_out",
+    "masuk": 0.4,
+    "stagger": 0.16
+  },
+  "subtitle": {
+    "latar": "pill",
+    "alpha_pill": 0.95
+  },
+  "bentuk": {
+    "radius": 0
+  },
+  "progress_bar": true,
+  "efek": {
+    "piksel": {
+      "skala": 6,
+      "dither": 0.28,
+      "palet": [
+        "#0F380F",
+        "#306230",
+        "#8BAC0F",
+        "#9BBC0F",
+        "#E0F8D0"
+      ]
+    }
+  }
+}

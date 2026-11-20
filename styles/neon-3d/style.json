@@ -1,0 +1,19 @@
+{
+  "id": "neon-3d",
+  "nama": "Neon 3D",
+  "kategori": "3d",
+  "deskripsi": "Lantai grid perspektif bergulir dengan matahari retro, huruf bertebal 3D, kartu poin miring dengan perspektif, dan grafik kolom 3D. Futuristik; cocok untuk teknologi, finansial, sains, dan data.",
+  "warna": {"latar": "#10002B", "latar2": "#2B0A45", "teks": "#FFFFFF", "aksen": "#FFD166", "aksen2": "#2EF2FF", "redup": "#C9A7E8", "kartu": "#2A1250", "teks_di_aksen": "#10002B", "label": "#FF2E93", "teks_label": "#FFFFFF", "stroke": "#10002B"},
+  "font": {"judul": "ArchivoBlack-Regular.ttf", "isi": "Poppins-Bold.ttf", "subtitle": "Poppins-Bold.ttf"},
+  "ukuran": {"hook": 104, "angka": 250, "isi": 62, "label": 58, "subtitle": 56},
+  "huruf_besar_judul": true,
+  "teks_3d": {"aktif": true, "kedalaman": 20, "arah": [1, 1], "warna_sisi": "#5A1AA0"},
+  "kartu_3d": {"aktif": true, "sudut": 13},
+  "bar_gaya": "tiang3d",
+  "latar_gerak": {"tipe": "lantai3d", "palet": {"matahari_atas": "#B5179E", "matahari_bawah": "#6A1B9A"}},
+  "gerak": {"easing": "overshoot", "masuk": 0.5, "stagger": 0.14},
+  "transisi": {"tipe": "naik"},
+  "subtitle": {"latar": "pill"},
+  "bentuk": {"radius": 30},
+  "efek": {"vignette": 0.35}
+}
