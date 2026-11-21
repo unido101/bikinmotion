@@ -43,7 +43,7 @@ def lembar_kontak(mp4, waktu, keluar_png, kolom=6, lebar=240, tmp="tmp_qc"):
 def frame_hitam(mp4, ambang=0.98):
     """Daftar interval frame hitam penuh (kecuali awal 0 s) lewat ffmpeg blackdetect."""
     p = subprocess.run(["ffmpeg", "-i", str(mp4), "-vf", f"blackdetect=d=0.1:pix_th=0.04:pic_th={ambang}",
-                        "-an", "-f", "null", "-"], capture_output=True, text=True)
+                        "-an", "-f", "null", "-"], capture_output=True, text=True, encoding="utf-8", errors="replace")
     return [ln.split("black_start:")[1].split()[0] for ln in p.stderr.splitlines() if "black_start" in ln]
 
 

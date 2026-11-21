@@ -14,8 +14,7 @@ Semua frame dihitung oleh kode (Pillow + numpy), lalu dirakit dengan ffmpeg.
 | TTS Gemini (REST): jalur sukses, 429 lalu ulang, 404 | Teruji dengan server palsu lokal; **belum dengan API sungguhan** |
 | Pembuat naskah Gemini (`buat_naskah`) dengan penolakan klaim tanpa sumber | Teruji dengan server palsu lokal; **belum dengan API sungguhan** |
 | Whisper (faster-whisper) | Kode ada; **belum dijalankan** (tidak terpasang di lingkungan uji) |
-| Workflow GitHub Actions (`buat-video.yml`) | YAML valid; **belum dijalankan di GitHub** |
-| Web app Vercel | Belum dibuat |
+| Halaman web (`web/`): galeri 10 style, penyusun naskah, petunjuk menjalankan | Jadi dan teruji di browser (desktop dan ponsel) |
 
 ## Pemakaian lokal
 
@@ -51,12 +50,36 @@ Nama model bisa diganti lewat env `GEMINI_TTS_MODEL` dan `GEMINI_TEXT_MODEL` (mo
 Timestamps: dengan `faster-whisper` terpasang (`pip install faster-whisper`) metode `whisper` memberi sinkron per kata.
 Tanpa itu, `diam` memperkirakan dari jeda audio dan alur memberi peringatan bahwa sinkron hanya perkiraan.
 
-## GitHub Actions
+## Halaman web (Vercel)
 
-1. Push repo ini ke GitHub (**privat**), tambahkan secret `GEMINI_API_KEY` (Settings > Secrets and variables > Actions).
-2. Opsional: variabel `GEMINI_TTS_MODEL`.
-3. Actions > "Buat video" > Run workflow, tempel isi `naskah.json`. Hasil ada di Artifacts (disimpan 1 hari; unduh lalu biarkan terhapus sendiri).
-4. Gambar dari user: commit ke `aset/` dan tulis path-nya di naskah.
+Folder `web/` adalah situs statis tanpa build: galeri style dengan pratinjau nyata, penyusun `naskah.json`
+(dengan pemeriksaan aturan yang sama persis seperti di Python), dan petunjuk menjalankan. Render tetap
+dikerjakan di komputermu; halaman ini tidak memanggil API apa pun dan tidak menyimpan kunci.
+
+**Deploy ke Vercel.** Repo ini berisi kode Python di akar, jadi Vercel perlu diberi tahu bahwa situsnya ada di `web/`:
+
+1. Vercel > proyek > **Settings** > **Build and Deployment** > **Root Directory** > Edit > isi `web` > Save.
+2. Di bagian **Framework Settings**, pilih Framework Preset **Other**. Kosongkan Build Command dan Output Directory.
+3. Deployments > titik tiga pada deploy terakhir > **Redeploy**.
+
+Tanpa langkah 1, Vercel melihat `requirements.txt` di akar dan mengira ini aplikasi Python (galat `PYTHON_ENTRYPOINT_NOT_FOUND`).
+
+Setelah menambah atau mengubah style: `python -m pipeline.preview` lalu `python -m pipeline.bangun_web`, commit, push.
+Uji halaman: `python tests/uji_halaman.py` (butuh `pip install playwright` dan `playwright install chromium`) dan `python tests/uji_web.py` (butuh node).
+
+## Menjalankan di komputer sendiri (Windows, macOS, Linux)
+
+Tidak butuh bash; yang dibutuhkan hanya Python 3.10+ dan ffmpeg di PATH.
+Windows: `winget install Gyan.FFmpeg`, lalu di PowerShell:
+
+```powershell
+py -m pip install -r requirements.txt
+$env:GEMINI_API_KEY = "kunci-kamu"
+py -m pipeline.otomatis --naskah naskah.json --out hasil\video.mp4
+```
+
+Catatan: GitHub Actions sengaja tidak dipakai untuk merender. Ketentuan GitHub membatasi pemakaiannya untuk
+proyek perangkat lunak (bukan komputasi serverless atau layanan), jadi render dijalankan di komputermu atau server milikmu.
 
 ## Aturan yang dijaga kode
 
@@ -133,11 +156,10 @@ Menambah style baru:
 
 ```
 pipeline/   animasi, gaya, teks, scene, render, validasi, qc, buat_video, preview, ekstrak_palet,
-            tts_gemini, tts_tiruan, selaras, susun, naskah_gemini, buat_naskah, otomatis
+            tts_gemini, tts_tiruan, selaras, susun, naskah_gemini, buat_naskah, otomatis, rakit, bangun_web
 styles/     10 style (2d-flat, pixelart, 3d), _template
 assets/     fonts
-scripts/    rakit_mp4.sh (video + VO + musik opsional, ducking, cek teknis)
 examples/   timeline.contoh.json, naskah.contoh.json (data tiruan, bukan fakta)
-tests/      uji_dasar.py, uji_lanjutan.py, timeline.gambar.json, aset/
-.github/    workflows/buat-video.yml
+tests/      uji_dasar.py, uji_lanjutan.py, uji_web.py, uji_halaman.py, timeline.gambar.json, aset/
+web/        index.html, app.css, app.js, naskah.js, styles.json, previews/, fonts/ (dibuat oleh pipeline.bangun_web)
 ```

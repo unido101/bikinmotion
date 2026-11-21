@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+hasil/
+tmp/
+.venv/
+node_modules/
+.env
+tests/tangkapan/

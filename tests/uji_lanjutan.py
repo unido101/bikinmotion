@@ -205,6 +205,38 @@ def _():
             assert abs(a["mulai"] - b["mulai"]) < 0.5, (a["tipe"], a["mulai"], b["mulai"])
 
 
+@uji("rakit.py (tanpa bash): dengan musik, ducking, semua cek teknis lolos; VO terpotong terdeteksi")
+def _():
+    import subprocess
+    from pipeline import rakit
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        run = lambda *a: subprocess.run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", *a], check=True)
+        run("-f", "lavfi", "-i", "testsrc2=size=270x480:rate=30:duration=6", "-pix_fmt", "yuv420p", "-c:v", "libx264", str(d / "b.mp4"))
+        run("-f", "lavfi", "-i", "sine=frequency=220:duration=5", str(d / "vo.wav"))
+        run("-f", "lavfi", "-i", "sine=frequency=440:duration=2", str(d / "m.mp3"))
+        ok, lap = rakit.rakit(d / "b.mp4", d / "vo.wav", d / "o.mp4", musik=d / "m.mp3", ekor=0.5)
+        assert ok, [x for x in lap if not x[1]]
+        assert any("audio pecah" in n for n, _, _ in lap)
+        assert abs(rakit.durasi(d / "o.mp4") - 5.5) < 0.1
+        ok2, lap2 = rakit.rakit(d / "b.mp4", d / "vo.wav", d / "o2.mp4", ekor=0.5)
+        assert ok2
+        # video bisu lebih pendek dari VO + ekor harus terdeteksi sebagai gagal
+        run("-f", "lavfi", "-i", "testsrc2=size=270x480:rate=30:duration=2", "-pix_fmt", "yuv420p", "-c:v", "libx264", str(d / "pendek.mp4"))
+        ok3, lap3 = rakit.rakit(d / "pendek.mp4", d / "vo.wav", d / "o3.mp4", ekor=0.5)
+        assert not ok3 and any(not l for _, l, _ in lap3)
+
+
+@uji("susun: lencana akun dari naskah diteruskan ke timeline")
+def _():
+    n = json.loads(NASKAH.read_text())
+    n["akun"] = "@akunuji"
+    _, kata, _ = susun.teks_vo(n)
+    kw = [{"kata": k, "mulai": i * 0.3, "selesai": i * 0.3 + 0.25} for i, (k, _) in enumerate(kata)]
+    tl, _ = susun.susun(n, kw, kw[-1]["selesai"] + 0.5)
+    assert tl["akun"] == "@akunuji"
+
+
 @uji("otomatis: naskah dengan [perlu verifikasi] atau angka tanpa sumber (ketat) ditolak sebelum render")
 def _():
     n = json.loads(NASKAH.read_text())

@@ -14,6 +14,8 @@ from .susun import teks_vo
 
 
 def main(argv=None):
+    from .buat_video import _utf8
+    _utf8()
     ap = argparse.ArgumentParser()
     ap.add_argument("--topik", required=True)
     ap.add_argument("--fakta", help="berkas teks, satu fakta per baris")

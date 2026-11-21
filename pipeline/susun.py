@@ -2,7 +2,7 @@
 
 Format naskah.json:
 {
-  "judul": "...", "style": "bersih-edukasi", "voice": "Kore",
+  "judul": "...", "style": "bersih-edukasi", "voice": "Kore", "akun": "@akunkamu",
   "gambar_user": ["aset/foto.jpg"],
   "bagian": [
     {"tipe": "hook", "teks": ["Baris *satu*"], "ucapan": "Kalimat yang diucapkan di VO."},
@@ -140,5 +140,5 @@ def susun(n, kata_waktu, durasi_total):
         if a["selesai"] > b["mulai"]:
             a["selesai"] = b["mulai"]
     tl = {"judul": n.get("judul", ""), "style": n.get("style", "bersih-edukasi"),
-          "gambar_user": n.get("gambar_user", []), "scene": scene, "subtitle": subs}
+          "gambar_user": n.get("gambar_user", []), "akun": n.get("akun", ""), "scene": scene, "subtitle": subs}
     return tl, peringatan

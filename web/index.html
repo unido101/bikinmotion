@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>bikinmotion: video pendek dari naskah</title>
+  <meta name="description" content="Pilih style, susun naskah, lalu render video motion graphic di komputermu. Semua frame digambar oleh kode.">
+  <link rel="preload" href="fonts/ArchivoBlack-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <a class="lompat" href="#naskah">Langsung ke naskah</a>
+  <header class="atas">
+    <a class="merek" href="#">bikinmotion</a>
+    <nav aria-label="Bagian halaman">
+      <a href="#style">Style</a>
+      <a href="#naskah">Naskah</a>
+      <a href="#jalankan">Jalankan</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="style" class="bagian" aria-labelledby="h-style">
+      <div class="kepala">
+        <h1 id="h-style">Bikin video pendek dari naskah</h1>
+        <p class="pengantar">Pilih tampilan, tulis naskah, lalu render di komputermu. Setiap frame digambar oleh kode. Strip di bawah adalah hasil nyata tiap style: hook, angka, poin, grafik, dan penutup.</p>
+      </div>
+      <div class="filter" role="group" aria-label="Filter keluarga style" id="filter"></div>
+      <div id="daftar-style" class="daftar-style" aria-live="polite"></div>
+    </section>
+
+    <section id="naskah" class="bagian" aria-labelledby="h-naskah">
+      <div class="kepala">
+        <h2 id="h-naskah">Susun naskah</h2>
+        <p class="pengantar">Tulis tiap bagian beserta kalimat yang akan dibacakan. Waktu muncul tiap bagian ditentukan otomatis dari suara VO.</p>
+      </div>
+      <div class="editor-grid">
+        <div class="editor" id="editor">
+          <div class="panel umum">
+            <label>Judul video<small>Hanya untuk catatanmu.</small><input type="text" id="f-judul" autocomplete="off"></label>
+            <label>Akun di pojok layar<small>Kosongkan bila tidak perlu.</small><input type="text" id="f-akun" autocomplete="off" placeholder="@akunkamu"></label>
+            <label>Suara VO (Gemini)<small>Nama suara bawaan Gemini TTS.</small><input type="text" id="f-voice" autocomplete="off" list="daftar-suara" placeholder="Kore"></label>
+            <datalist id="daftar-suara"><option>Kore</option><option>Puck</option><option>Charon</option><option>Fenrir</option><option>Aoede</option><option>Zephyr</option></datalist>
+            <p class="style-dipakai" id="style-dipakai"></p>
+          </div>
+          <div id="daftar-bagian"></div>
+          <div class="tambah" id="tambah" role="group" aria-label="Tambah bagian"></div>
+        </div>
+
+        <aside class="ringkas" aria-label="Ringkasan naskah">
+          <div class="panel">
+            <dl class="angka-ringkas">
+              <div><dt>Kata VO</dt><dd id="r-kata">0</dd></div>
+              <div><dt>Perkiraan durasi</dt><dd id="r-durasi">0 dtk</dd></div>
+            </dl>
+            <p class="catatan-kecil">Durasi final mengikuti rekaman VO, bukan perkiraan ini.</p>
+            <ul class="masalah" id="r-masalah" aria-live="polite"></ul>
+          </div>
+          <div class="panel">
+            <div class="baris-aksi">
+              <button type="button" class="utama" id="b-salin">Salin naskah.json</button>
+              <button type="button" id="b-unduh">Unduh</button>
+            </div>
+            <pre class="json" id="r-json" tabindex="0" aria-label="Isi naskah.json"></pre>
+            <details class="impor">
+              <summary>Impor naskah.json yang sudah ada</summary>
+              <textarea id="i-teks" rows="5" placeholder="Tempel isi naskah.json di sini"></textarea>
+              <button type="button" id="b-impor">Muat ke formulir</button>
+              <p class="catatan-kecil" id="i-pesan" role="status"></p>
+            </details>
+            <button type="button" class="bahaya" id="b-reset">Kosongkan formulir</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="jalankan" class="bagian" aria-labelledby="h-jalankan">
+      <div class="kepala">
+        <h2 id="h-jalankan">Jalankan di komputermu</h2>
+        <p class="pengantar">Render dikerjakan di komputermu sendiri, jadi tidak ada biaya server dan kuncimu tidak keluar dari komputer. Halaman ini hanya membantu menyusun naskahnya.</p>
+      </div>
+      <div class="os" role="group" aria-label="Sistem operasi">
+        <button type="button" data-os="win" aria-pressed="true">Windows</button>
+        <button type="button" data-os="unix" aria-pressed="false">macOS / Linux</button>
+      </div>
+      <ol class="langkah" id="langkah"></ol>
+    </section>
+  </main>
+
+  <footer class="kaki"><p>bikinmotion: pemakaian pribadi. Teks dan angka pada pratinjau hanyalah contoh, bukan fakta.</p></footer>
+
+  <script src="naskah.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

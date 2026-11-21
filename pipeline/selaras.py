@@ -74,7 +74,7 @@ def segmen_suara(audio, noise="-35dB", d=0.25):
     """Interval non-diam [(mulai, selesai)] lewat ffmpeg silencedetect."""
     total = durasi(audio)
     p = subprocess.run(["ffmpeg", "-i", str(audio), "-af", f"silencedetect=noise={noise}:d={d}", "-f", "null", "-"],
-                       capture_output=True, text=True)
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
     mulai = [float(x) for x in re.findall(r"silence_start: ([\d.]+)", p.stderr)]
     akhir = [float(x) for x in re.findall(r"silence_end: ([\d.]+)", p.stderr)]
     diam = list(zip(mulai, akhir + [total] * (len(mulai) - len(akhir))))

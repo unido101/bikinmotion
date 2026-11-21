@@ -25,6 +25,7 @@ def _mutlak(n, dasar):
 
 
 def main(argv=None):
+    buat_video._utf8()
     ap = argparse.ArgumentParser()
     ap.add_argument("--naskah", required=True)
     ap.add_argument("--out", required=True)

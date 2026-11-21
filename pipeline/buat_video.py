@@ -13,11 +13,21 @@ import sys
 from pathlib import Path
 
 from . import gaya as gaya_mod
+from .rakit import rakit
 from .qc import frame_hitam, lembar_kontak, waktu_penting
 from .render import render_video
 from .validasi import validasi
 
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def _utf8():
+    """Konsol Windows sering memakai sandi halaman lama; paksa UTF-8 agar teks tidak error."""
+    for f in (sys.stdout, sys.stderr):
+        try:
+            f.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
 
 
 def durasi_media(path):
@@ -27,6 +37,7 @@ def durasi_media(path):
 
 
 def main(argv=None):
+    _utf8()
     ap = argparse.ArgumentParser()
     ap.add_argument("--timeline", required=True)
     ap.add_argument("--audio", help="berkas VO utuh; durasi video mengikuti VO")
@@ -69,13 +80,10 @@ def main(argv=None):
 
     print("3/5 rakit audio dan video")
     if a.audio:
-        cmd = ["bash", str(ROOT / "scripts" / "rakit_mp4.sh"), str(bisu), a.audio, str(out)]
-        if a.musik:
-            cmd += [a.musik, str(a.ekor)]
-        else:
-            cmd += ["", str(a.ekor)]
-        r = subprocess.run(cmd)
-        if r.returncode != 0:
+        ok, laporan = rakit(bisu, a.audio, out, musik=a.musik, ekor=a.ekor)
+        for nama, lolos, detail in laporan:
+            print(("  LOLOS  " if lolos else "  GAGAL  ") + nama + (f"  ({detail})" if detail else ""))
+        if not ok:
             print("  GAGAL: pengecekan teknis tidak lolos (lihat di atas)")
             return 3
         bisu.unlink(missing_ok=True)
