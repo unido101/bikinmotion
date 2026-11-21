@@ -62,7 +62,12 @@ dikerjakan di komputermu; halaman ini tidak memanggil API apa pun dan tidak meny
 2. Di bagian **Framework Settings**, pilih Framework Preset **Other**. Kosongkan Build Command dan Output Directory.
 3. Deployments > titik tiga pada deploy terakhir > **Redeploy**.
 
-Tanpa langkah 1, Vercel melihat `requirements.txt` di akar dan mengira ini aplikasi Python (galat `PYTHON_ENTRYPOINT_NOT_FOUND`).
+Tanpa itu, Vercel melihat `requirements.txt` di akar dan mengira ini aplikasi Python (galat `PYTHON_ENTRYPOINT_NOT_FOUND`).
+Preset framework yang tersimpan di proyek (ikon Python di dasbor) tidak berubah hanya karena menambah folder, jadi `web/vercel.json` dan
+`vercel.json` di akar sama-sama berisi `"framework": null` (= preset Other) untuk menimpanya per-deploy.
+
+Jika galat yang sama muncul lagi, cara paling bersih: hapus proyek Vercel lama, lalu Add New > Project > impor repo ini, klik Edit pada
+**Root Directory** isi `web`, Framework Preset **Other**, lalu Deploy.
 
 Setelah menambah atau mengubah style: `python -m pipeline.preview` lalu `python -m pipeline.bangun_web`, commit, push.
 Uji halaman: `python tests/uji_halaman.py` (butuh `pip install playwright` dan `playwright install chromium`) dan `python tests/uji_web.py` (butuh node).
