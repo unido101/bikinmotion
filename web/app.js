@@ -31,7 +31,7 @@
       { k: "sumber", t: "teks", label: "Sumber data", bantu: "Wajib bila data ini fakta.", ph: "Nama lembaga dan tahun" }],
       ucapan: { label: "Kalimat yang dibacakan", ph: "Jelaskan apa yang dibandingkan." } },
     gambar: { bidang: [
-      { k: "file", t: "teks", label: "Path gambar", bantu: "Taruh berkasnya di folder aset/ pada proyekmu.", ph: "aset/foto.jpg" },
+      { k: "file", t: "berkas", label: "Gambar", bantu: "Path berkas di folder aset/ pada proyekmu.", ph: "aset/foto.jpg" },
       { k: "teks", t: "teks", label: "Keterangan (opsional)", ph: "Teks di bawah gambar" },
       { k: "bingkai", t: "pilih", label: "Bingkai", opsi: [["kartu", "Kartu (ada ruang di sekitarnya)"], ["penuh", "Penuh layar (ilustrasi latar)"]] },
       { k: "mode", t: "pilih", label: "Pemotongan", opsi: [["auto", "Otomatis"], ["cover", "Isi penuh, dipotong"], ["contain", "Utuh, latar buram"]] }],
@@ -47,6 +47,8 @@
   var URUT_TAMBAH = ["hook", "angka", "poin", "bar", "gambar", "label", "penutup"];
 
   var STYLES = [], filter = "semua";
+  var hosted = null;                       // {k, uid} bila akun aktif dan mode server tersedia
+  var terakhir = { naskah: null, galat: [], totalKata: 0 };
   var state = muat() || awal();
 
   function awal() {
@@ -89,6 +91,13 @@
   /* ------------------------------------------------ editor naskah */
   function bidangHtml(i, b, d, nilai) {
     var kelas = d.wide ? ' class="lebar"' : "", bantu = d.bantu ? "<small>" + esc(d.bantu) + "</small>" : "", isi;
+    if (d.t === "berkas" && hosted) {
+      var ada = /^unggahan:/.test(nilai || "");
+      bantu = "<small>PNG, JPEG, atau WEBP, maksimal 8 MB. Diunggah ke akunmu.</small>";
+      return "<label" + kelas + ">" + esc(d.label) + bantu + '<input type="file" data-unggah="' + d.k + '" accept="image/png,image/jpeg,image/webp">' +
+        '<span class="catatan-kecil" data-status-berkas>' + (ada ? "Terunggah: " + esc(String(nilai).replace(/^unggahan:[^/]*\/\d+-/, "")) : "Belum ada gambar.") + "</span></label>";
+    }
+    if (d.t === "berkas") d = { k: d.k, t: "teks", label: d.label, bantu: d.bantu, ph: d.ph };
     if (d.t === "area") isi = '<textarea data-k="' + d.k + '" rows="' + (d.rows || 2) + '" placeholder="' + esc(d.ph || "") + '">' + esc(nilai) + "</textarea>";
     else if (d.t === "pilih") isi = '<select data-k="' + d.k + '">' + d.opsi.map(function (o) { return '<option value="' + o[0] + '"' + ((nilai || d.opsi[0][0]) === o[0] ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select>";
     else isi = '<input type="text" data-k="' + d.k + '" value="' + esc(nilai) + '" placeholder="' + esc(d.ph || "") + '" autocomplete="off">';
@@ -134,6 +143,7 @@
     var h = Naskah.bangunNaskah(state);
     var c = Naskah.cekNaskah(h.naskah, false);
     var galat = h.ui.galat.concat(c.galat), peringatan = h.ui.peringatan.concat(c.peringatan);
+    terakhir = { naskah: h.naskah, galat: galat, totalKata: c.totalKata };
     $("#r-kata").textContent = c.totalKata;
     $("#r-durasi").textContent = c.totalKata ? Math.round(Naskah.perkiraanDetik(c.totalKata)) + " dtk" : "0 dtk";
     var li;
@@ -215,6 +225,50 @@
 
   function isiUmum() { $("#f-judul").value = state.judul || ""; $("#f-akun").value = state.akun || ""; $("#f-voice").value = state.voice || ""; }
 
+
+  /* ------------------------------------------------ mode server (akun aktif) */
+  var kunciAda = false;
+  function pesanServer(t, html) { var p = $("#server-pesan"); if (html) p.innerHTML = t; else p.textContent = t; }
+  function cekKunci() {
+    hosted.k.from("kunci_api").select("penyedia,akhir").eq("penyedia", "gemini").maybeSingle().then(function (r) {
+      if (r.error) throw r.error;
+      kunciAda = !!r.data;
+      $("#server-kunci").innerHTML = kunciAda ? "Kunci Gemini tersimpan (\u2022\u2022\u2022\u2022" + esc(r.data.akhir) + ")." :
+        'Kunci Gemini belum disimpan. <a href="pengaturan.html">Simpan di Pengaturan</a> dulu.';
+      $("#b-buat").disabled = !kunciAda;
+    }).catch(function (e) { $("#server-kunci").textContent = Akses.pesanGalat(e); });
+  }
+  function aktifkanServer(ctx) {
+    hosted = { k: ctx.k, uid: ctx.p.id };
+    $("#panel-server").hidden = false; $("#info-lokal").hidden = false;
+    renderBagian(); cekKunci();
+  }
+  function buatVideo() {
+    var n = terakhir; pesanServer("");
+    if (formulirKosong()) return pesanServer("Isi naskah dulu: mulai dari hook.");
+    if (n.galat.length) return pesanServer("Perbaiki dulu: " + ramah(n.galat[0]) + (n.galat.length > 1 ? " (dan " + (n.galat.length - 1) + " lainnya)" : ""));
+    if (n.totalKata > 450) return pesanServer("Naskah " + n.totalKata + " kata. Video di server dibatasi 450 kata (sekitar 2,5 menit).");
+    var tombol = $("#b-buat"); tombol.disabled = true; pesanServer("Mengirim ke antrian...");
+    hosted.k.from("job").insert({ judul: n.naskah.judul || null, style: n.naskah.style, naskah: n.naskah }).select("id").single().then(function (r) {
+      if (r.error) throw r.error;
+      pesanServer('Video masuk antrian. <a href="video.html">Lihat kemajuannya</a>.', true);
+    }).catch(function (e) { pesanServer(Akses.pesanGalat(e)); }).then(function () { tombol.disabled = !kunciAda; });
+  }
+  function unggah(i, input) {
+    var f = input.files[0]; if (!f) return;
+    var st = input.parentNode.querySelector("[data-status-berkas]");
+    if (["image/png", "image/jpeg", "image/webp"].indexOf(f.type) < 0) { st.textContent = "Format harus PNG, JPEG, atau WEBP."; input.value = ""; return; }
+    if (f.size > 8 * 1024 * 1024) { st.textContent = "Ukuran maksimal 8 MB."; input.value = ""; return; }
+    var nama = f.name.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").slice(-60) || "gambar";
+    var path = hosted.uid + "/" + Date.now() + "-" + nama;
+    st.textContent = "Mengunggah...";
+    hosted.k.storage.from("unggahan").upload(path, f, { contentType: f.type, upsert: false }).then(function (r) {
+      if (r.error) throw r.error;
+      state.bagian[i].f = state.bagian[i].f || {}; state.bagian[i].f.file = "unggahan:" + path;
+      simpan(); renderBagian(); perbarui();
+    }).catch(function (e) { st.textContent = Akses.pesanGalat(e); input.value = ""; });
+  }
+
   /* ------------------------------------------------ peristiwa */
   document.addEventListener("click", function (e) {
     var t = e.target.closest("button"); if (!t) return;
@@ -235,6 +289,7 @@
       var a2 = document.createElement("a"); a2.href = URL.createObjectURL(new Blob([jsonTerakhir], { type: "application/json" })); a2.download = "naskah.json";
       document.body.appendChild(a2); a2.click(); document.body.removeChild(a2); setTimeout(function () { URL.revokeObjectURL(a2.href); }, 500);
     } else if (t.id === "b-impor") impor();
+    else if (t.id === "b-buat") buatVideo();
     else if (t.id === "b-reset") { if (confirm("Kosongkan formulir? Isian yang belum kamu salin akan hilang.")) { var s0 = state.style, os0 = state.os; state = awal(); state.style = s0; state.os = os0; simpan(); isiUmum(); renderStyle(); renderBagian(); perbarui(); } }
     else if (t.dataset.os) { state.os = t.dataset.os; simpan(); langkah(); }
     else if (t.hasAttribute("data-salin")) salin(t.parentNode.querySelector("pre").textContent, t);
@@ -244,6 +299,7 @@
     var b = state.bagian[+kartu.dataset.i]; b.f = b.f || {}; b.f[k] = e.target.value; simpan(); perbarui();
   });
   $("#daftar-bagian").addEventListener("change", function (e) {
+    if (e.target.dataset.unggah && hosted) return unggah(+e.target.closest(".bag").dataset.i, e.target);
     if (e.target.dataset.aksi === "tipe") { state.bagian[+e.target.closest(".bag").dataset.i].tipe = e.target.value; simpan(); renderBagian(); perbarui(); }
   });
   [["#f-judul", "judul"], ["#f-akun", "akun"], ["#f-voice", "voice"]].forEach(function (p) {
@@ -260,4 +316,5 @@
     $("#daftar-style").innerHTML = '<div class="galat-muat"><strong>Daftar style tidak bisa dimuat</strong> (' + esc(err.message) +
       '). Jika kamu membuka berkas langsung dari folder, jalankan <code>python -m http.server</code> di folder web lalu buka alamat yang ditampilkan.</div>';
   });
+  if (window.Auth) window.Auth.gerbang().then(function (ctx) { if (ctx && ctx.k) aktifkanServer(ctx); });
 })();

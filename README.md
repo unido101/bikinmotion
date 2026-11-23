@@ -15,6 +15,8 @@ Semua frame dihitung oleh kode (Pillow + numpy), lalu dirakit dengan ffmpeg.
 | Pembuat naskah Gemini (`buat_naskah`) dengan penolakan klaim tanpa sumber | Teruji dengan server palsu lokal; **belum dengan API sungguhan** |
 | Whisper (faster-whisper) | Kode ada; **belum dijalankan** (tidak terpasang di lingkungan uji) |
 | Halaman web (`web/`): galeri 10 style, penyusun naskah, petunjuk menjalankan | Jadi dan teruji di browser (desktop dan ponsel) |
+| Login Supabase, persetujuan admin, masa aktif (halaman dan alur) | Teruji di browser dengan stub Supabase; **belum dengan Supabase sungguhan** |
+| Skema basis data dan aturan RLS (`supabase/`) | Ditulis, **belum dijalankan** (tidak ada Postgres di lingkungan uji); jalankan `uji_rls.sql` |
 
 ## Pemakaian lokal
 
@@ -72,7 +74,64 @@ Jika galat yang sama muncul lagi, cara paling bersih: hapus proyek Vercel lama, 
 Setelah menambah atau mengubah style: `python -m pipeline.preview` lalu `python -m pipeline.bangun_web`, commit, push.
 Uji halaman: `python tests/uji_halaman.py` (butuh `pip install playwright` dan `playwright install chromium`) dan `python tests/uji_web.py` (butuh node).
 
-## Menjalankan di komputer sendiri (Windows, macOS, Linux)
+## Akun dan persetujuan admin (Supabase)
+
+Login memakai Supabase Auth; tiap pengguna punya akun sendiri. Akun baru berstatus `menunggu`; admin mengaktifkannya
+(dengan masa aktif) setelah langganan terkonfirmasi. Halaman: `masuk.html` (masuk, daftar, lupa dan atur ulang kata sandi,
+status akun) dan `admin.html` (daftar pengguna, aktifkan atau perpanjang 30/90/365 hari, tangguhkan, log perubahan).
+Tanpa konfigurasi, situs berjalan seperti biasa tanpa login.
+
+**Penyiapan (sekali):**
+
+1. supabase.com > New project (pilih region terdekat, mis. Singapore). Simpan kata sandi database di tempat aman.
+2. **SQL Editor** > tempel seluruh `supabase/schema.sql` > Run.
+3. **Authentication > Sign In / Providers**: pastikan Email aktif; sebaiknya biarkan "Confirm email" menyala dan atur panjang kata sandi minimal 8.
+4. **Authentication > URL Configuration**: Site URL = alamat situs Vercel-mu; tambahkan `https://ALAMAT-KAMU/masuk.html` ke Redirect URLs
+   (dipakai tautan konfirmasi dan pemulihan kata sandi).
+5. **Project Settings > API**: salin Project URL dan kunci publik (publishable atau anon) ke `web/konfigurasi.js`. **Jangan** memakai kunci `secret`/`service_role`.
+6. Daftar lewat `masuk.html` memakai emailmu, lalu jadikan dirimu admin di SQL Editor:
+   `update public.profil set peran='admin', status='aktif', aktif_sampai=null where email='emailkamu@contoh.com';`
+7. Jalankan `supabase/uji_rls.sql` sekali di SQL Editor: harus muncul NOTICE `SEMUA UJI LOLOS`. Skrip ini menguji aturan akses nyata
+   (user biasa tidak bisa mengaktifkan dirinya, mengubah peran, atau membaca audit; admin tidak bisa mengubah akunnya sendiri, dll.) dan di-ROLLBACK.
+8. Commit dan push `web/konfigurasi.js`.
+
+**Catatan keamanan:**
+
+- Kunci publik memang terlihat di browser. Yang melindungi data adalah Row Level Security di `schema.sql`; setiap tabel baru di schema `public` wajib mengaktifkannya.
+- Peran (`peran`) hanya bisa diubah lewat SQL Editor, tidak lewat API. Admin tidak bisa mengubah akunnya sendiri (mencegah terkunci).
+- Menggerbang halaman statis hanyalah kenyamanan: isi `web/` tetap bisa diunduh siapa pun. Perlindungan nyata datang saat ada layanan di server
+  (job render, penyimpanan kunci API user) yang memakai `public.akses_aktif()` pada kebijakan tabelnya.
+- Header keamanan (CSP, dsb.) dihasilkan `pipeline/bangun_web.py`. Jika memakai domain kustom untuk Supabase, tambahkan ke `connect-src` di berkas itu lalu jalankan ulang `python -m pipeline.bangun_web`.
+- Pustaka `supabase-js` dimuat dari CDN dengan versi dipatok (lihat `web/auth.js`). Untuk pengamanan tambahan, unduh berkasnya ke `web/` dan muat dari sana.
+- Paket gratis Supabase menjeda proyek yang tidak aktif seminggu; untuk layanan yang dipakai orang lain, pakai paket berbayar.
+- Uji: `python tests/uji_auth.py` (stub Supabase; tidak menguji library asli), `node tests/uji_akses.js`.
+
+## Mode server: video dirender di server (tanpa instal apa pun bagi pengguna)
+
+Dengan akun aktif, pengguna cukup menyusun naskah lalu klik **Buat video**. Kunci API Gemini mereka disimpan terenkripsi
+(Supabase Vault) lewat halaman **Pengaturan**; gambar diunggah ke penyimpanan privat; video muncul di **Video saya**
+lengkap dengan kemajuan, unduhan, dan lembar kontak. Rendernya dikerjakan **worker** (lihat `worker/README.md`).
+
+**Penyiapan tambahan di Supabase** (setelah `schema.sql`):
+
+1. SQL Editor > tempel dan jalankan `supabase/job.sql` (tabel job, kunci terenkripsi, bucket `unggahan` dan `hasil`, aturan akses).
+2. Jalankan `supabase/uji_job.sql`: harus muncul NOTICE `SEMUA UJI LOLOS`.
+3. Project Settings > API: salin kunci **secret** untuk worker (JANGAN ke `web/konfigurasi.js`).
+4. Jalankan worker (`worker/README.md`): komputermu sendiri untuk uji, atau VPS.
+
+Alur: browser membuat baris di tabel `job` (hanya bisa atas nama sendiri dan hanya bila akun aktif) -> worker mengambilnya,
+membaca kunci pemiliknya lewat fungsi khusus, memproses, mengunggah ke bucket `hasil` -> browser mengunduh lewat tautan bertanda tangan 10 menit.
+
+| Bagian | Status |
+|--------|--------|
+| Worker (validasi, antrian, unggah, pembersihan), diuji dengan Supabase dan Gemini palsu | Teruji (27 uji termasuk serangan keamanan) |
+| Halaman Pengaturan, Video saya, tombol Buat video, unggah gambar | Teruji di browser dengan stub Supabase (34 uji) |
+| `job.sql`: antrian, Vault, bucket, aturan akses | Ditulis, **belum dijalankan**; jalankan `uji_job.sql` |
+| Koneksi ke Supabase dan Gemini sungguhan, image Docker | **Belum teruji** |
+
+Uji: `python tests/uji_worker.py`, `python tests/uji_server.py`.
+
+## Mode lokal: menjalankan di komputer sendiri (Windows, macOS, Linux)
 
 Tidak butuh bash; yang dibutuhkan hanya Python 3.10+ dan ffmpeg di PATH.
 Windows: `winget install Gyan.FFmpeg`, lalu di PowerShell:
@@ -160,11 +219,13 @@ Menambah style baru:
 ## Struktur
 
 ```
-pipeline/   animasi, gaya, teks, scene, render, validasi, qc, buat_video, preview, ekstrak_palet,
+pipeline/   animasi, gaya, teks, scene, render, validasi, qc, buat_video, jalankan, preview, ekstrak_palet,
             tts_gemini, tts_tiruan, selaras, susun, naskah_gemini, buat_naskah, otomatis, rakit, bangun_web
 styles/     10 style (2d-flat, pixelart, 3d), _template
 assets/     fonts
 examples/   timeline.contoh.json, naskah.contoh.json (data tiruan, bukan fakta)
-tests/      uji_dasar.py, uji_lanjutan.py, uji_web.py, uji_halaman.py, timeline.gambar.json, aset/
-web/        index.html, app.css, app.js, naskah.js, styles.json, previews/, fonts/ (dibuat oleh pipeline.bangun_web)
+tests/      uji_dasar.py, uji_lanjutan.py, uji_web.py, uji_halaman.py, uji_auth.py, uji_server.py, uji_worker.py, uji_akses.js, stub_supabase.js, timeline.gambar.json, aset/
+web/        index.html, masuk.html, admin.html, app.css, app.js, naskah.js, akses.js, auth.js, konfigurasi.js, styles.json, previews/, fonts/
+supabase/   schema.sql, job.sql (tabel, trigger, RLS, Vault, Storage), uji_rls.sql, uji_job.sql
+worker/     main.py, proses.py, rest.py, Dockerfile, README.md (worker server)
 ```

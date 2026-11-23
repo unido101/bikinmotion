@@ -7,6 +7,8 @@
   <meta name="description" content="Pilih style, susun naskah, lalu render video motion graphic di komputermu. Semua frame digambar oleh kode.">
   <link rel="preload" href="fonts/ArchivoBlack-Regular.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="app.css">
+  <script src="konfigurasi.js"></script>
+  <script src="gerbang-awal.js"></script>
 </head>
 <body>
   <a class="lompat" href="#naskah">Langsung ke naskah</a>
@@ -17,6 +19,13 @@
       <a href="#naskah">Naskah</a>
       <a href="#jalankan">Jalankan</a>
     </nav>
+    <div class="akun" id="akun-info" hidden>
+      <span class="akun-email" id="akun-email"></span>
+      <a href="video.html">Video saya</a>
+      <a href="pengaturan.html">Pengaturan</a>
+      <a id="akun-admin" href="admin.html" hidden>Admin</a>
+      <button type="button" id="akun-keluar">Keluar</button>
+    </div>
   </header>
 
   <main>
@@ -56,6 +65,12 @@
             <p class="catatan-kecil">Durasi final mengikuti rekaman VO, bukan perkiraan ini.</p>
             <ul class="masalah" id="r-masalah" aria-live="polite"></ul>
           </div>
+          <div class="panel" id="panel-server" hidden>
+            <h3>Buat video di server</h3>
+            <p class="catatan-kecil" id="server-kunci">Memeriksa kunci Gemini...</p>
+            <button type="button" class="utama" id="b-buat" disabled>Buat video</button>
+            <p class="catatan-kecil" id="server-pesan" role="status" aria-live="polite"></p>
+          </div>
           <div class="panel">
             <div class="baris-aksi">
               <button type="button" class="utama" id="b-salin">Salin naskah.json</button>
@@ -79,6 +94,7 @@
         <h2 id="h-jalankan">Jalankan di komputermu</h2>
         <p class="pengantar">Render dikerjakan di komputermu sendiri, jadi tidak ada biaya server dan kuncimu tidak keluar dari komputer. Halaman ini hanya membantu menyusun naskahnya.</p>
       </div>
+      <div class="notif info" id="info-lokal" hidden>Langkah di bawah ini untuk mode lokal. Dengan akunmu yang aktif, cukup klik <strong>Buat video</strong> di panel naskah; tidak perlu memasang apa pun.</div>
       <div class="os" role="group" aria-label="Sistem operasi">
         <button type="button" data-os="win" aria-pressed="true">Windows</button>
         <button type="button" data-os="unix" aria-pressed="false">macOS / Linux</button>
@@ -90,6 +106,8 @@
   <footer class="kaki"><p>bikinmotion: pemakaian pribadi. Teks dan angka pada pratinjau hanyalah contoh, bukan fakta.</p></footer>
 
   <script src="naskah.js"></script>
+  <script src="akses.js"></script>
+  <script src="auth.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

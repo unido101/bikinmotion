@@ -108,7 +108,7 @@
         isi("file", satuKalimat(f.file)); isi("teks", satuKalimat(f.teks));
         if (f.bingkai && f.bingkai !== "kartu") o.bingkai = f.bingkai;
         if (f.mode && f.mode !== "auto") o.mode = f.mode;
-        if (o.file && !/^aset\//.test(o.file))
+        if (o.file && !/^(aset\/|unggahan:)/.test(o.file))
           galatUI.peringatan.push(nama + ": taruh gambar di folder aset/ dan tulis path-nya, mis. aset/foto.jpg");
         break;
       case "penutup":

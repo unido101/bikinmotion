@@ -415,20 +415,25 @@ class Renderer:
         return self.efek.terapkan(img, t)
 
 
-def render_video(tl, g, durasi, keluar, tampil_progres=True):
+def render_video(tl, g, durasi, keluar, tampil_progres=True, kemajuan=None):
     """Render video bisu H.264 30 fps sepanjang `durasi` detik ke berkas `keluar`."""
     r = Renderer(tl, g, durasi)
     n = round(durasi * g.fps)
+    # Grain acak hampir tidak bisa dikompresi: pada CRF rendah berkas bisa belasan kali lebih besar.
+    crf = "25" if g.efek.get("grain", 0) > 0 else "20"
     ff = subprocess.Popen(
         ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
          "-s", f"{g.W}x{g.H}", "-r", str(g.fps), "-i", "-", "-an",
-         "-c:v", "libx264", "-preset", "veryfast", "-crf", "18", "-pix_fmt", "yuv420p", str(keluar)],
+         "-c:v", "libx264", "-preset", "veryfast", "-crf", crf, "-pix_fmt", "yuv420p", str(keluar)],
         stdin=subprocess.PIPE)
     try:
         for i in range(n):
             ff.stdin.write(r.frame(i / g.fps).tobytes())
-            if tampil_progres and i % (g.fps * 2) == 0:
-                print(f"  render {i}/{n} frame", file=sys.stderr, flush=True)
+            if i % (g.fps * 2) == 0:
+                if tampil_progres:
+                    print(f"  render {i}/{n} frame", file=sys.stderr, flush=True)
+                if kemajuan:
+                    kemajuan(i, n)
     finally:
         ff.stdin.close()
         ff.wait()

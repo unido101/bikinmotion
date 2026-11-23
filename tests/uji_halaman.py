@@ -2,9 +2,6 @@
 Menyajikan web/ lewat server lokal, mengecek galat konsol, interaksi utama, dan membuat tangkapan layar di tests/tangkapan/."""
 import json
 import sys
-import threading
-from functools import partial
-from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
@@ -14,14 +11,11 @@ OUT = ROOT / "tests" / "tangkapan"
 OUT.mkdir(exist_ok=True)
 
 
-class Diam(SimpleHTTPRequestHandler):
-    def log_message(self, *a):
-        pass
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _server
 
-
-srv = ThreadingHTTPServer(("127.0.0.1", 0), partial(Diam, directory=str(ROOT / "web")))
-threading.Thread(target=srv.serve_forever, daemon=True).start()
-URL = f"http://127.0.0.1:{srv.server_port}/"
+srv, BASE = _server.mulai()
+URL = BASE + "/"
 hasil = []
 
 

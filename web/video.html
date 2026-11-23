@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="id" data-gerbang>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Video saya: bikinmotion</title>
+  <link rel="stylesheet" href="app.css">
+  <script src="konfigurasi.js"></script>
+  <script src="gerbang-awal.js"></script>
+</body>
+</html>
+<body>
+  <header class="atas">
+    <a class="merek" href="index.html">bikinmotion</a>
+    <nav aria-label="Navigasi"><a href="index.html">Studio</a></nav>
+    <div class="akun" id="akun-info" hidden>
+      <span class="akun-email" id="akun-email"></span>
+      <a href="video.html">Video saya</a>
+      <a href="pengaturan.html">Pengaturan</a>
+      <a id="akun-admin" href="admin.html" hidden>Admin</a>
+      <button type="button" id="akun-keluar">Keluar</button>
+    </div>
+  </header>
+
+  <main class="bagian sempit">
+    <div class="kepala">
+      <h1 class="h-halaman">Video saya</h1>
+      <p class="pengantar">Video dirender di server, biasanya beberapa menit. Halaman ini memperbarui kemajuannya otomatis. Hasil dihapus otomatis setelah 7 hari, jadi unduh yang kamu butuhkan.</p>
+    </div>
+    <div id="v-pesan" class="notif" role="status" hidden></div>
+    <div id="v-daftar" class="daftar-job" aria-live="polite"></div>
+    <p id="v-kosong" class="kosong" hidden>Belum ada video. Susun naskah di <a href="index.html#naskah">studio</a>, lalu klik Buat video.</p>
+    <p><button type="button" class="ikon" id="v-muat">Muat ulang</button></p>
+  </main>
+
+  <script src="akses.js"></script>
+  <script src="auth.js"></script>
+  <script src="video.js"></script>
+</body>
+</html>

@@ -11,8 +11,8 @@ import os
 import sys
 from pathlib import Path
 
-from . import buat_video, selaras
-from .susun import cek_naskah, susun, teks_vo
+from . import buat_video, jalankan
+from .susun import cek_naskah, teks_vo
 
 
 def _mutlak(n, dasar):
@@ -44,7 +44,6 @@ def main(argv=None):
     kerja = out.parent / (out.stem + "_kerja")
     kerja.mkdir(parents=True, exist_ok=True)
 
-    print("1/5 periksa naskah")
     galat, peringatan = cek_naskah(n, ketat=a.ketat)
     for p in peringatan:
         print("  PERINGATAN:", p)
@@ -52,53 +51,33 @@ def main(argv=None):
         for e in galat:
             print("  GALAT:", e)
         return 2
-    vo_teks, kata, _ = teks_vo(n)
-    kata_str = [k for k, _ in kata]
-    print(f"  {len(kata_str)} kata VO (perkiraan {len(kata_str) / 2.7:.0f} detik)")
+    _, kata, _ = teks_vo(n)
+    print(f"  {len(kata)} kata VO (perkiraan {len(kata) / 2.7:.0f} detik)")
 
-    print("2/5 suara (VO)")
-    if a.audio:
-        audio = Path(a.audio)
-        print(f"  memakai VO dari user: {audio}")
-        exact = None
-    elif a.tts == "tiruan":
-        from .tts_tiruan import sintesis_tiruan
-        audio = kerja / "vo.wav"
-        exact = sintesis_tiruan(kata_str, audio)
-        print("  TTS TIRUAN (nada, hanya untuk uji)")
-    else:
-        from .tts_gemini import sintesis
-        audio = kerja / "vo.wav"
-        sintesis(vo_teks, audio, voice=n.get("voice", "Kore"))
-        print(f"  VO dibuat dengan Gemini TTS: {audio}")
-        exact = None
+    terakhir = {"t": None}
 
-    print("3/5 timestamps kata")
-    if exact is not None:
-        kata_waktu, metode, akurat = [dict(x, cocok=True) for x in exact], "tepat (tiruan)", True
-    else:
-        kata_waktu, metode, akurat = selaras.hitung(kata_str, audio, a.selaras, a.whisper_ukuran)
-    cocok = sum(1 for k in kata_waktu if k.get("cocok"))
-    print(f"  metode: {metode}; kata cocok langsung {cocok}/{len(kata_waktu)}")
-    if not akurat:
-        print("  PERINGATAN: sinkron hanya perkiraan dari jeda audio. Cek lembar kontak; pasang faster-whisper untuk hasil akurat")
-    (kerja / "kata.json").write_text(json.dumps(kata_waktu, ensure_ascii=False, indent=1), encoding="utf-8")
+    def lapor(tahap, persen):
+        if tahap != terakhir["t"]:
+            terakhir["t"] = tahap
+            print(f"[{persen:3d}%] {tahap}")
 
-    print("4/5 susun timeline")
-    vo_dur = selaras.durasi(audio)
-    tl, pr = susun(n, kata_waktu, round(vo_dur + a.ekor, 3))
-    for p in pr:
+    try:
+        hasil = jalankan.buat(
+            n, dasar=naskah_path.parent, kerja=kerja, keluar=out,
+            tts="tiruan" if a.tts == "tiruan" else "gemini",
+            kunci_gemini=os.environ.get("GEMINI_API_KEY"), audio=a.audio,
+            selaras_metode=a.selaras, whisper_ukuran=a.whisper_ukuran, musik=a.musik, ekor=a.ekor,
+            ketat=a.ketat, lapor=lapor)
+    except jalankan.GalatNaskah as e:
+        print("GALAT NASKAH:", e)
+        return 2
+    except (jalankan.GalatProses, RuntimeError) as e:
+        print("GAGAL:", e)
+        return 3
+    for p in hasil["peringatan"]:
         print("  PERINGATAN:", p)
-    tl_path = kerja / "timeline.json"
-    tl_path.write_text(json.dumps(tl, ensure_ascii=False, indent=1), encoding="utf-8")
-
-    print("5/5 render dan cek")
-    args = ["--timeline", str(tl_path), "--audio", str(audio), "--out", str(out), "--ekor", str(a.ekor)]
-    if a.musik:
-        args += ["--musik", a.musik]
-    if a.ketat:
-        args += ["--ketat"]
-    return buat_video.main(args)
+    print(f"SELESAI: {out}\n  lembar kontak: {hasil['kontak']}")
+    return 0
 
 
 if __name__ == "__main__":
