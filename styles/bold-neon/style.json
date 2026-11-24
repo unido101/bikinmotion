@@ -1,0 +1,14 @@
+{
+  "id": "bold-neon",
+  "nama": "Bold Neon",
+  "deskripsi": "Hitam pekat, huruf Anton kapital besar, aksen magenta dan cyan. Energik dan cepat, cocok untuk fakta singkat dan topik tren.",
+  "warna": {"latar": "#07070B", "latar2": "#0D0B16", "teks": "#FFFFFF", "aksen": "#FF2E93", "aksen2": "#2EF2FF", "redup": "#8C8CA0", "kartu": "#16121F", "teks_di_aksen": "#FFFFFF"},
+  "font": {"judul": "Anton-Regular.ttf", "isi": "Poppins-Medium.ttf", "subtitle": "Poppins-Bold.ttf"},
+  "ukuran": {"hook": 150, "angka": 330, "isi": 66, "label": 62},
+  "huruf_besar_judul": true,
+  "latar_gerak": {"tipe": "glow", "kekuatan": 0.30},
+  "gerak": {"easing": "overshoot", "masuk": 0.5, "stagger": 0.10},
+  "transisi": {"tipe": "naik", "masuk": 0.30, "keluar": 0.20},
+  "subtitle": {"latar": "stroke"},
+  "bentuk": {"radius": 20}
+}

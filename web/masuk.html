@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Masuk: bikinmotion</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header class="atas">
+    <a class="merek" href="index.html">bikinmotion</a>
+    <nav aria-label="Navigasi"><a href="index.html">Beranda</a></nav>
+  </header>
+
+  <main class="kartu-masuk">
+    <section class="panel" aria-labelledby="h-masuk">
+      <h1 id="h-masuk">Masuk</h1>
+      <div id="pesan" class="notif galat" role="alert" hidden></div>
+
+      <div id="tampilan-form">
+        <div class="tabs" role="group" aria-label="Pilih tindakan">
+          <button type="button" data-tab="masuk" aria-pressed="true">Masuk</button>
+          <button type="button" data-tab="daftar" aria-pressed="false">Daftar</button>
+        </div>
+
+        <form id="f-masuk" novalidate>
+          <label>Email<input type="email" name="email" autocomplete="email" inputmode="email" required></label>
+          <label>Kata sandi<input type="password" name="sandi" autocomplete="current-password" required></label>
+          <button type="submit" class="utama">Masuk</button>
+          <button type="button" class="tautan" data-tab="lupa">Lupa kata sandi?</button>
+        </form>
+
+        <form id="f-daftar" novalidate hidden>
+          <label>Email<input type="email" name="email" autocomplete="email" inputmode="email" required></label>
+          <label>Kata sandi<small>Minimal 8 karakter.</small><input type="password" name="sandi" autocomplete="new-password" minlength="8" required></label>
+          <button type="submit" class="utama">Buat akun</button>
+          <p class="catatan-kecil">Setelah mendaftar, akunmu perlu disetujui admin. Persetujuan diberikan setelah langgananmu terkonfirmasi.</p>
+        </form>
+
+        <form id="f-lupa" novalidate hidden>
+          <label>Email akunmu<input type="email" name="email" autocomplete="email" inputmode="email" required></label>
+          <button type="submit" class="utama">Kirim tautan pemulihan</button>
+          <button type="button" class="tautan" data-tab="masuk">Kembali ke masuk</button>
+        </form>
+
+        <label class="centang"><input type="checkbox" id="lihat-sandi"> Tampilkan kata sandi</label>
+      </div>
+
+      <div id="tampilan-status" hidden>
+        <h2 id="status-judul"></h2>
+        <p id="status-isi"></p>
+        <p class="catatan-kecil" id="status-email"></p>
+        <div class="baris-aksi">
+          <button type="button" class="utama" id="b-cek">Periksa lagi</button>
+          <button type="button" id="b-keluar">Keluar</button>
+        </div>
+      </div>
+
+      <form id="f-pulih" novalidate hidden>
+        <p>Buat kata sandi baru untuk akunmu.</p>
+        <label>Kata sandi baru<small>Minimal 8 karakter.</small><input type="password" name="sandi" autocomplete="new-password" minlength="8" required></label>
+        <button type="submit" class="utama">Simpan kata sandi</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="konfigurasi.js"></script>
+  <script src="akses.js"></script>
+  <script src="auth.js"></script>
+  <script src="masuk.js"></script>
+</body>
+</html>

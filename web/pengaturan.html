@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="id" data-gerbang>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Pengaturan: bikinmotion</title>
+  <link rel="stylesheet" href="app.css">
+  <script src="konfigurasi.js"></script>
+  <script src="gerbang-awal.js"></script>
+</head>
+<body>
+  <header class="atas">
+    <a class="merek" href="index.html">bikinmotion</a>
+    <nav aria-label="Navigasi"><a href="index.html">Studio</a></nav>
+    <div class="akun" id="akun-info" hidden>
+      <span class="akun-email" id="akun-email"></span>
+      <a href="video.html">Video saya</a>
+      <a href="pengaturan.html">Pengaturan</a>
+      <a id="akun-admin" href="admin.html" hidden>Admin</a>
+      <button type="button" id="akun-keluar">Keluar</button>
+    </div>
+  </header>
+
+  <main class="bagian sempit">
+    <div class="kepala">
+      <h1 class="h-halaman">Pengaturan</h1>
+      <p class="pengantar">Video dibuat di server memakai kunci API milikmu sendiri, jadi biaya dan kuota pemakaian AI-nya ada di akun Google-mu.</p>
+    </div>
+
+    <div id="p-pesan" class="notif" role="status" hidden></div>
+
+    <section class="panel" aria-labelledby="h-gemini">
+      <h2 class="h-kecil nol" id="h-gemini">Kunci API Gemini</h2>
+      <p id="p-status" class="status-kunci">Memuat...</p>
+      <form id="f-kunci" novalidate>
+        <label>Kunci API<small>Dipakai untuk membuat suara narasi. Tempel kuncinya di sini.</small>
+          <input type="password" name="kunci" autocomplete="off" spellcheck="false" placeholder="Tempel kunci API"></label>
+        <div class="baris-aksi">
+          <button type="submit" class="utama" id="p-simpan">Simpan kunci</button>
+          <button type="button" class="bahaya" id="p-hapus" hidden>Hapus kunci</button>
+        </div>
+      </form>
+
+      <h3 class="h-mini">Cara mendapatkan kunci</h3>
+      <ol class="daftar-biasa">
+        <li>Buka aistudio.google.com dan masuk dengan akun Google-mu.</li>
+        <li>Buat API key baru di bagian API keys.</li>
+        <li>Salin kuncinya, tempel di kolom di atas, lalu simpan.</li>
+      </ol>
+
+      <h3 class="h-mini">Bagaimana kunci diperlakukan</h3>
+      <ul class="daftar-biasa">
+        <li>Disimpan terenkripsi, tidak pernah ditampilkan lagi (hanya 4 karakter terakhir).</li>
+        <li>Hanya dipakai server saat memproses videomu sendiri.</li>
+        <li>Bisa dihapus kapan saja. Menghapus kunci langsung menghentikan pemakaiannya.</li>
+        <li>Pada paket gratis Gemini, menurut ketentuan Google isi permintaan dapat dipakai untuk meningkatkan produk mereka. Cek ketentuan terbaru, dan jangan menulis data pribadi di naskah.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="akses.js"></script>
+  <script src="auth.js"></script>
+  <script src="pengaturan.js"></script>
+</body>
+</html>

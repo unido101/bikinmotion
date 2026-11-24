@@ -1,0 +1,9 @@
+.git
+web
+tests
+examples
+supabase
+styles/*/reference
+**/__pycache__
+hasil
+*.md
